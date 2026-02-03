@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('content');
             $table->string('type')->nullable();
             $table->unsignedInteger('usage_count')->default(0);
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }

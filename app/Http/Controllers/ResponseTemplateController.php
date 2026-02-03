@@ -34,12 +34,15 @@ class ResponseTemplateController extends Controller
             });
         }
 
+        // Filter by user
+        $query->where('user_id', auth()->user()->id);
+
         // Order by usage count
         $orderDirection = $request->get('usage_order', 'desc');
         $query->orderBy('usage_count', $orderDirection);
 
-        // Paginate with 52 items per page
-        $responseTemplates = $query->paginate(52)->withQueryString();
+        // Paginate with 24 items per page
+        $responseTemplates = $query->paginate(24)->withQueryString();
         $categories = Category::all();
         $types = ResponseTemplate::distinct()->pluck('type')->filter()->values();
 
@@ -72,6 +75,7 @@ class ResponseTemplateController extends Controller
             'name' => $validated['name'],
             'content' => $validated['content'],
             'type' => $validated['type'] ?? null,
+            'user_id' => auth()->user()->id,
         ]);
 
         if (isset($validated['category_ids'])) {
@@ -91,13 +95,14 @@ class ResponseTemplateController extends Controller
             'content' => 'required|string',
             'type' => 'nullable|string|max:255',
             'category_ids' => 'nullable|array',
-            'category_ids.*' => 'exists:categories,id',
+            'category_ids.*' => 'exists:categories,id'
         ]);
 
         $responseTemplate->update([
             'name' => $validated['name'],
             'content' => $validated['content'],
             'type' => $validated['type'] ?? null,
+            'user_id' => auth()->user()->id,
         ]);
 
         if (isset($validated['category_ids'])) {
@@ -114,6 +119,10 @@ class ResponseTemplateController extends Controller
      */
     public function destroy(ResponseTemplate $responseTemplate)
     {
+        if ($responseTemplate->user_id !== auth()->user()->id) {
+            return redirect()->back()->with('error', 'Vous n\'avez pas les permissions pour supprimer cette réponse type.');
+        }
+
         $responseTemplate->delete();
 
         return redirect()->back()->with('success', 'Réponse type supprimée avec succès.');
