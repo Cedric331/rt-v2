@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('response_templates', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->text('content');
             $table->string('type')->nullable();
             $table->unsignedInteger('usage_count')->default(0);

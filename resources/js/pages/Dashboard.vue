@@ -26,6 +26,7 @@ import Pagination from '@/components/Pagination.vue';
 
 interface ResponseTemplate {
     id: number;
+    name: string;
     content: string;
     type: string | null;
     usage_count: number;
@@ -87,12 +88,14 @@ const toastMessage = ref<string>('');
 const showToast = ref(false);
 
 const createForm = useForm({
+    name: '',
     content: '',
     type: '',
     category_ids: [] as number[],
 });
 
 const editForm = useForm({
+    name: '',
     content: '',
     type: '',
     category_ids: [] as number[],
@@ -155,6 +158,7 @@ const openCreateDialog = () => {
 
 const openEditDialog = (template: ResponseTemplate) => {
     editingTemplate.value = template;
+    editForm.name = template.name;
     editForm.content = template.content;
     editForm.type = template.type || '';
     editForm.category_ids = template.categories.map(c => c.id);
@@ -452,6 +456,16 @@ const confirmDeleteCategory = () => {
                             </DialogHeader>
                             <form @submit.prevent="submitCreate" class="space-y-4">
                                 <div class="grid gap-2">
+                                    <Label for="name">Nom</Label>
+                                    <Input
+                                        id="name"
+                                        v-model="createForm.name"
+                                        placeholder="Ex: Réponse type 1"
+                                        required
+                                    />
+                                    <AlertError v-if="createForm.errors.name" :errors="[createForm.errors.name]" />
+                                </div>
+                                <div class="grid gap-2">
                                     <Label for="content">Contenu</Label>
                                     <textarea
                                         id="content"
@@ -467,7 +481,7 @@ const confirmDeleteCategory = () => {
                                     <Input
                                         id="type"
                                         v-model="createForm.type"
-                                        placeholder="Ex: Email, SMS, Chat..."
+                                         placeholder="Ex: Image noir ou Freeze"
                                     />
                                     <AlertError v-if="createForm.errors.type" :errors="[createForm.errors.type]" />
                                 </div>
@@ -564,7 +578,7 @@ const confirmDeleteCategory = () => {
             </Card>
 
             <!-- Response Templates List -->
-            <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div class="grid gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 <Card
                     v-for="template in displayedTemplates"
                     :key="template.id"
@@ -585,6 +599,7 @@ const confirmDeleteCategory = () => {
                             </Badge>
                         </div>
                         <CardTitle class="text-base mb-0 flex-1 overflow-hidden">
+                        <h3 class="text-lg font-bold">{{ template.name }}</h3>
                             <button
                                 @click="copyContent(template)"
                                 class="text-left w-full h-full hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer group-hover:underline whitespace-pre-wrap break-words overflow-auto"
@@ -644,6 +659,16 @@ const confirmDeleteCategory = () => {
                     </DialogHeader>
                     <form @submit.prevent="submitEdit" class="space-y-4">
                         <div class="grid gap-2">
+                            <Label for="edit-name">Nom</Label>
+                            <Input
+                                id="edit-name"
+                                v-model="editForm.name"
+                                placeholder="Ex: Réponse type 1"
+                                required
+                            />
+                            <AlertError v-if="editForm.errors.name" :errors="[editForm.errors.name]" />
+                        </div>
+                        <div class="grid gap-2">
                             <Label for="edit-content">Contenu</Label>
                             <textarea
                                 id="edit-content"
@@ -659,7 +684,7 @@ const confirmDeleteCategory = () => {
                             <Input
                                 id="edit-type"
                                 v-model="editForm.type"
-                                placeholder="Ex: Email, SMS, Chat..."
+                                placeholder="Ex: Image noir ou Freeze"
                             />
                             <AlertError v-if="editForm.errors.type" :errors="[editForm.errors.type]" />
                         </div>

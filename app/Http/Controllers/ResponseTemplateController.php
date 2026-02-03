@@ -17,6 +17,11 @@ class ResponseTemplateController extends Controller
     {
         $query = ResponseTemplate::with('categories');
 
+        // Filter by name
+        if ($request->has('name') && $request->name) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+
         // Filter by type
         if ($request->has('type') && $request->type) {
             $query->where('type', $request->type);
@@ -56,6 +61,7 @@ class ResponseTemplateController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'name' => 'required|string|max:255',
             'content' => 'required|string',
             'type' => 'nullable|string|max:255',
             'category_ids' => 'nullable|array',
@@ -63,6 +69,7 @@ class ResponseTemplateController extends Controller
         ]);
 
         $responseTemplate = ResponseTemplate::create([
+            'name' => $validated['name'],
             'content' => $validated['content'],
             'type' => $validated['type'] ?? null,
         ]);
@@ -80,6 +87,7 @@ class ResponseTemplateController extends Controller
     public function update(Request $request, ResponseTemplate $responseTemplate)
     {
         $validated = $request->validate([
+            'name' => 'required|string|max:255',
             'content' => 'required|string',
             'type' => 'nullable|string|max:255',
             'category_ids' => 'nullable|array',
@@ -87,6 +95,7 @@ class ResponseTemplateController extends Controller
         ]);
 
         $responseTemplate->update([
+            'name' => $validated['name'],
             'content' => $validated['content'],
             'type' => $validated['type'] ?? null,
         ]);

@@ -11,6 +11,7 @@ class ResponseTemplate extends Model
     use HasFactory;
 
     protected $fillable = [
+        'name',
         'content',
         'type',
         'usage_count',
