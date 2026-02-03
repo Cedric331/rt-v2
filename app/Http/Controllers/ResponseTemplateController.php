@@ -15,11 +15,11 @@ class ResponseTemplateController extends Controller
      */
     public function index(Request $request): Response
     {
-        $query = ResponseTemplate::with('categories');
+        $query = ResponseTemplate::with('categories')->where('user_id', auth()->user()->id);
 
         // Filter by name
-        if ($request->has('name') && $request->name) {
-            $query->where('name', 'like', '%' . $request->name . '%');
+        if ($request->has('search') && $request->search) {
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
 
         // Filter by type
@@ -33,9 +33,6 @@ class ResponseTemplateController extends Controller
                 $q->where('categories.id', $request->category_id);
             });
         }
-
-        // Filter by user
-        $query->where('user_id', auth()->user()->id);
 
         // Order by usage count
         $orderDirection = $request->get('usage_order', 'desc');

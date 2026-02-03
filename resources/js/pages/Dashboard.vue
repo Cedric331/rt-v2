@@ -81,6 +81,7 @@ const editingTemplate = ref<ResponseTemplate | null>(null);
 const editingCategory = ref<Category | null>(null);
 const templateToDelete = ref<ResponseTemplate | null>(null);
 const categoryToDelete = ref<Category | null>(null);
+const search = ref<string>('');
 const selectedType = ref<string>(props.filters.type || '');
 const selectedCategory = ref<number | null>(props.filters.category_id || null);
 const usageOrder = ref<string>(props.filters.usage_order || 'desc');
@@ -130,6 +131,7 @@ const paginationLinks = computed(() => {
 
 const applyFilters = () => {
     const filters: Record<string, any> = {};
+    if (search.value) filters.search = search.value;
     if (selectedType.value) filters.type = selectedType.value;
     if (selectedCategory.value) filters.category_id = selectedCategory.value;
     if (usageOrder.value) filters.usage_order = usageOrder.value;
@@ -141,6 +143,7 @@ const applyFilters = () => {
 };
 
 const clearFilters = () => {
+    search.value = '';
     selectedType.value = '';
     selectedCategory.value = null;
     usageOrder.value = 'desc';
@@ -526,7 +529,21 @@ const confirmDeleteCategory = () => {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div class="grid gap-4 md:grid-cols-3">
+                    <div class="grid gap-4 md:grid-cols-4">
+
+                        <!-- barre de recherche -->
+                        <div class="grid gap-2">
+                            <Label for="filter-search">Rechercher par nom</Label>
+                            <Input
+                                id="filter-search"
+                                v-model="search"
+                                @change="applyFilters"
+                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            >
+                                <input type="text" v-model="search" placeholder="Rechercher" />
+                            </Input>
+                        </div>
+
                         <div class="grid gap-2">
                             <Label for="filter-type">Tag</Label>
                             <select
